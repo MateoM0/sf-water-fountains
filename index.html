@@ -10,11 +10,9 @@
     <!-- Leaflet CSS -->
     <link rel="stylesheet" href="css/leaflet.css">
 
-    <!-- qgis2web CSS -->
-    <link rel="stylesheet" href="css/L.Control.Layers.Tree.css">
+    <!-- qgis2web / custom CSS -->
     <link rel="stylesheet" href="css/qgis2web.css">
     <link rel="stylesheet" href="css/fontawesome-all.min.css">
-    <link rel="stylesheet" href="css/leaflet.photon.css">
 
     <!-- Leaflet Locate Control CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet.locatecontrol/dist/L.Control.Locate.min.css" />
@@ -53,25 +51,16 @@
             margin-top: 6px;
         }
     </style>
-    <title>San Francisco Fountains</title>
+
+    <title>San Francisco Water Fountains</title>
 </head>
 <body>
     <div id="map"></div>
 
     <!-- JS Libraries -->
-    <script src="js/qgis2web_expressions.js"></script>
     <script src="js/leaflet.js"></script>
-    <script src="js/L.Control.Layers.Tree.min.js"></script>
-    <script src="js/leaflet.rotatedMarker.js"></script>
-    <script src="js/leaflet.pattern.js"></script>
-    <script src="js/leaflet-hash.js"></script>
     <script src="js/Autolinker.min.js"></script>
-    <script src="js/rbush.min.js"></script>
-    <script src="js/labelgun.min.js"></script>
-    <script src="js/labels.js"></script>
     <script src="js/leaflet.photon.js"></script>
-
-    <!-- Leaflet Locate Control JS -->
     <script src="https://unpkg.com/leaflet.locatecontrol/dist/L.Control.Locate.min.js"></script>
 
     <!-- GeoJSON data -->
@@ -80,14 +69,14 @@
     <script>
         // Initialize map
         var map = L.map('map', {
-            zoomControl:false,
-            maxZoom:28,
-            minZoom:1
-        }).fitBounds([[37.7684788952563,-122.4272325217047],[37.803453756944855,-122.359286131694]]);
+            zoomControl: false,
+            maxZoom: 28,
+            minZoom: 1
+        }).fitBounds([[37.7685,-122.4272],[37.8035,-122.3593]]);
 
         // Add basemap
-        var layer_EsriLightGray_0 = L.tileLayer('https://server.arcgisonline.com/arcgis/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}', {
-            opacity: 1.0,
+        L.tileLayer('https://server.arcgisonline.com/arcgis/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}', {
+            opacity: 1,
             minZoom: 1,
             maxZoom: 28
         }).addTo(map);
@@ -103,54 +92,41 @@
         var hash = new L.Hash(map);
 
         // Attribution
-        map.attributionControl.setPrefix('<a href="https://github.com/tomchadwin/qgis2web" target="_blank">qgis2web</a> &middot; <a href="https://leafletjs.com">Leaflet</a> &middot; <a href="https://qgis.org">QGIS</a>');
+        map.attributionControl.setPrefix(
+            '<a href="https://github.com/tomchadwin/qgis2web" target="_blank">qgis2web</a> &middot; ' +
+            '<a href="https://leafletjs.com" target="_blank">Leaflet</a> &middot; ' +
+            '<a href="https://qgis.org" target="_blank">QGIS</a>'
+        );
 
-        // Autolinker
-        var autolinker = new Autolinker({truncate: {length: 30, location: 'smart'}});
-
-        // Zoom control
-        var zoomControl = L.control.zoom({ position: 'topleft' }).addTo(map);
-
-        // Bounds group
-        var bounds_group = new L.featureGroup([]);
-
-        // Remove empty rows (legacy from qgis2web)
-        function removeEmptyRowsFromPopupContent(content, feature) {
-            var tempDiv = document.createElement('div');
-            tempDiv.innerHTML = content;
-            var rows = tempDiv.querySelectorAll('tr');
-            for (var i = 0; i < rows.length; i++) {
-                var td = rows[i].querySelector('td.visible-with-data');
-                var key = td ? td.id : '';
-                if (td && td.classList.contains('visible-with-data') && feature.properties[key] == null) {
-                    rows[i].parentNode.removeChild(rows[i]);
-                }
-            }
-            return tempDiv.innerHTML;
+        // Helper for conditional dot colors
+        function dotColor(field, feature) {
+            return feature.properties[field] === true || feature.properties[field] === 'true' ? '#2ecc71' : '#555';
         }
 
-        // Add mobile-friendly popup
-        function pop_fountains_cleansan_francisco_public_bathrooms_and_water_fountains_20251207_1(feature, layer) {
+        // Mobile-friendly popup
+        function fountainPopup(feature, layer) {
             var html = '<div class="popup-content">' +
                 '<div class="popup-features">' +
-                '<span style="color:' + (feature.properties.water_fountain ? '#2ecc71':'#555') + '">●</span> Water ' +
-                '<span style="color:' + (feature.properties.bottle_filler ? '#2ecc71':'#555') + '">●</span> Bottle ' +
-                '<span style="color:' + (feature.properties.jug_filler ? '#2ecc71':'#555') + '">●</span> Jug ' +
-                '<span style="color:' + (feature.properties.dog_fountain ? '#2ecc71':'#555') + '">●</span> Dog' +
+                    '<span style="color:' + dotColor('water_fountain', feature) + ';">●</span> Water Fountain<br>' +
+                    '<span style="color:' + dotColor('bottle_filler', feature) + ';">●</span> Bottle Filler<br>' +
+                    '<span style="color:' + dotColor('jug_filler', feature) + ';">●</span> Jug Filler<br>' +
+                    '<span style="color:' + dotColor('dog_fountain', feature) + ';">●</span> Dog Fountain' +
                 '</div>' +
                 '<div class="popup-title">' + (feature.properties.name || '') + '</div>' +
                 (feature.properties.notes_context ? feature.properties.notes_context + '<br>' : '') +
                 '<b>Hours:</b> ' + (feature.properties.popup_display || 'Unknown') + '<br>' +
                 '<a class="popup-button" target="_blank" href="https://www.google.com/maps/dir/?api=1&destination=' +
-                feature.geometry.coordinates[1] + ',' + feature.geometry.coordinates[0] + '&travelmode=walking">🧭 Walk Directions</a>' +
-                '</div>';
+                feature.geometry.coordinates[1] + ',' + feature.geometry.coordinates[0] +
+                '&travelmode=walking">Google Maps</a>' +
+            '</div>';
+
             layer.bindPopup(html, { maxHeight: 400 });
         }
 
-        // Style fountains
-        function style_fountains(feature) {
+        // Style for fountains
+        function fountainStyle(feature) {
             return {
-                radius: 4.0,
+                radius: 4,
                 opacity: 1,
                 color: 'rgba(35,35,35,1.0)',
                 fill: true,
@@ -160,15 +136,14 @@
             };
         }
 
-        // Add fountains layer
-        var layer_fountains = L.geoJson(json_fountains_cleansan_francisco_public_bathrooms_and_water_fountains_20251207_1, {
-            onEachFeature: pop_fountains_cleansan_francisco_public_bathrooms_and_water_fountains_20251207_1,
-            pointToLayer: function (feature, latlng) {
-                return L.circleMarker(latlng, style_fountains(feature));
+        // Add GeoJSON fountains layer
+        var fountainsLayer = L.geoJson(json_fountains_cleansan_francisco_public_bathrooms_and_water_fountains_20251207_1, {
+            onEachFeature: fountainPopup,
+            pointToLayer: function(feature, latlng) {
+                return L.circleMarker(latlng, fountainStyle(feature));
             }
         }).addTo(map);
-
-        bounds_group.addLayer(layer_fountains);
     </script>
 </body>
 </html>
+
