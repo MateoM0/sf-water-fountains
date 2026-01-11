@@ -10,7 +10,7 @@
     <!-- Leaflet CSS -->
     <link rel="stylesheet" href="css/leaflet.css">
 
-    <!-- qgis2web / custom CSS -->
+    <!-- Custom CSS -->
     <link rel="stylesheet" href="css/qgis2web.css">
     <link rel="stylesheet" href="css/fontawesome-all.min.css">
 
@@ -27,18 +27,9 @@
             width: 100%;
             height: 100%;
         }
-        .popup-content {
-            font-size: 14px;
-            line-height: 1.3;
-        }
-        .popup-title {
-            font-weight: 600;
-            margin-bottom: 4px;
-        }
-        .popup-features span {
-            font-size: 14px;
-            margin-right: 6px;
-        }
+        .popup-content { font-size: 14px; line-height: 1.3; }
+        .popup-title { font-weight: 600; margin-bottom: 4px; }
+        .popup-features span { font-size: 14px; margin-right: 6px; }
         .popup-button {
             display: block;
             text-align: center;
@@ -74,21 +65,21 @@
             minZoom: 1
         }).fitBounds([[37.7685,-122.4272],[37.8035,-122.3593]]);
 
-        // Add basemap
+        // Basemap
         L.tileLayer('https://server.arcgisonline.com/arcgis/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}', {
             opacity: 1,
             minZoom: 1,
             maxZoom: 28
         }).addTo(map);
 
-        // Add Locate button
+        // Locate button
         L.control.locate({
             position: 'topleft',
             strings: { title: "Show my location" },
             locateOptions: { enableHighAccuracy: true }
         }).addTo(map);
 
-        // Add hash for URL coordinates
+        // URL hash for coordinates
         var hash = new L.Hash(map);
 
         // Attribution
@@ -98,7 +89,7 @@
             '<a href="https://qgis.org" target="_blank">QGIS</a>'
         );
 
-        // Helper for conditional dot colors
+        // Helper: conditional dot color
         function dotColor(field, feature) {
             return feature.properties[field] === true || feature.properties[field] === 'true' ? '#2ecc71' : '#555';
         }
@@ -116,10 +107,8 @@
                 (feature.properties.notes_context ? feature.properties.notes_context + '<br>' : '') +
                 '<b>Hours:</b> ' + (feature.properties.popup_display || 'Unknown') + '<br>' +
                 '<a class="popup-button" target="_blank" href="https://www.google.com/maps/dir/?api=1&destination=' +
-                feature.geometry.coordinates[1] + ',' + feature.geometry.coordinates[0] +
-                '&travelmode=walking">Google Maps</a>' +
+                feature.geometry.coordinates[1] + ',' + feature.geometry.coordinates[0] + '&travelmode=walking">🧭 Walk Directions</a>' +
             '</div>';
-
             layer.bindPopup(html, { maxHeight: 400 });
         }
 
@@ -136,7 +125,7 @@
             };
         }
 
-        // Add GeoJSON fountains layer
+        // Add GeoJSON layer
         var fountainsLayer = L.geoJson(json_fountains_cleansan_francisco_public_bathrooms_and_water_fountains_20251207_1, {
             onEachFeature: fountainPopup,
             pointToLayer: function(feature, latlng) {
@@ -146,4 +135,3 @@
     </script>
 </body>
 </html>
-
