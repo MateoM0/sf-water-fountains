@@ -66,11 +66,10 @@
         }).fitBounds([[37.7685,-122.4272],[37.8035,-122.3593]]);
 
         // Basemap
-        L.tileLayer('https://server.arcgisonline.com/arcgis/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}', {
-            opacity: 1,
-            minZoom: 1,
-            maxZoom: 28
-        }).addTo(map);
+        L.tileLayer(
+            'https://server.arcgisonline.com/arcgis/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}',
+            { maxZoom: 28 }
+        ).addTo(map);
 
         // Locate button
         L.control.locate({
@@ -79,59 +78,62 @@
             locateOptions: { enableHighAccuracy: true }
         }).addTo(map);
 
-        // URL hash for coordinates
-        var hash = new L.Hash(map);
-
         // Attribution
         map.attributionControl.setPrefix(
-            '<a href="https://github.com/tomchadwin/qgis2web" target="_blank">qgis2web</a> &middot; ' +
-            '<a href="https://leafletjs.com" target="_blank">Leaflet</a> &middot; ' +
+            '<a href="https://github.com/tomchadwin/qgis2web" target="_blank">qgis2web</a> · ' +
+            '<a href="https://leafletjs.com" target="_blank">Leaflet</a> · ' +
             '<a href="https://qgis.org" target="_blank">QGIS</a>'
         );
 
-        // Helper: conditional dot color
+        // Conditional dot color
         function dotColor(field, feature) {
-            return feature.properties[field] === true || feature.properties[field] === 'true' ? '#2ecc71' : '#555';
+            return feature.properties[field] === true || feature.properties[field] === 'true'
+                ? '#2ecc71'
+                : '#555';
         }
 
-        // Mobile-friendly popup
+        // Popup
         function fountainPopup(feature, layer) {
-            var html = '<div class="popup-content">' +
-                '<div class="popup-features">' +
-                    '<span style="color:' + dotColor('water_fountain', feature) + ';">●</span> Water Fountain<br>' +
-                    '<span style="color:' + dotColor('bottle_filler', feature) + ';">●</span> Bottle Filler<br>' +
-                    '<span style="color:' + dotColor('jug_filler', feature) + ';">●</span> Jug Filler<br>' +
-                    '<span style="color:' + dotColor('dog_fountain', feature) + ';">●</span> Dog Fountain' +
-                '</div>' +
-                '<div class="popup-title">' + (feature.properties.name || '') + '</div>' +
-                (feature.properties.notes_context ? feature.properties.notes_context + '<br>' : '') +
-                '<b>Hours:</b> ' + (feature.properties.popup_display || 'Unknown') + '<br>' +
-                '<a class="popup-button" target="_blank" href="https://www.google.com/maps/dir/?api=1&destination=' +
-                feature.geometry.coordinates[1] + ',' + feature.geometry.coordinates[0] + '&travelmode=walking">🧭 Walk Directions</a>' +
-            '</div>';
+            var html =
+                '<div class="popup-content">' +
+                    '<div class="popup-features">' +
+                        '<span style="color:' + dotColor('water_fountain', feature) + ';">●</span> Water Fountain<br>' +
+                        '<span style="color:' + dotColor('bottle_filler', feature) + ';">●</span> Bottle Filler<br>' +
+                        '<span style="color:' + dotColor('jug_filler', feature) + ';">●</span> Jug Filler<br>' +
+                        '<span style="color:' + dotColor('dog_fountain', feature) + ';">●</span> Dog Fountain' +
+                    '</div>' +
+                    '<div class="popup-title">' + (feature.properties.name || '') + '</div>' +
+                    (feature.properties.notes_context || '') + '<br>' +
+                    '<b>Hours:</b> ' + (feature.properties.popup_display || 'Unknown') +
+                    '<a class="popup-button" target="_blank" href="https://www.google.com/maps/dir/?api=1&destination=' +
+                        feature.geometry.coordinates[1] + ',' + feature.geometry.coordinates[0] +
+                        '&travelmode=walking">🧭 Walk Directions</a>' +
+                '</div>';
+
             layer.bindPopup(html, { maxHeight: 400 });
         }
 
-        // Style for fountains
-        function fountainStyle(feature) {
+        // Marker style
+        function fountainStyle() {
             return {
                 radius: 4,
-                opacity: 1,
-                color: 'rgba(35,35,35,1.0)',
-                fill: true,
-                fillOpacity: 1,
-                fillColor: 'rgba(61,165,225,1.0)',
-                interactive: true
+                color: '#232323',
+                weight: 1,
+                fillColor: '#3da5e1',
+                fillOpacity: 1
             };
         }
 
-        // Add GeoJSON layer
-        var fountainsLayer = L.geoJson(json_fountains_cleansan_francisco_public_bathrooms_and_water_fountains_20251207_1, {
-            onEachFeature: fountainPopup,
-            pointToLayer: function(feature, latlng) {
-                return L.circleMarker(latlng, fountainStyle(feature));
+        // Add fountains
+        L.geoJson(
+            json_fountains_cleansan_francisco_public_bathrooms_and_water_fountains_20251207_1,
+            {
+                onEachFeature: fountainPopup,
+                pointToLayer: function (feature, latlng) {
+                    return L.circleMarker(latlng, fountainStyle());
+                }
             }
-        }).addTo(map);
+        ).addTo(map);
     </script>
 </body>
 </html>
