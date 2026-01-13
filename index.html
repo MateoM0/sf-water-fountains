@@ -34,7 +34,7 @@
             display: block;
             text-align: center;
             background: #1a73e8;
-            color: white;
+            color: rgb(255, 255, 255);
             padding: 8px;
             border-radius: 6px;
             text-decoration: none;
@@ -104,10 +104,10 @@
                     '</div>' +
                     '<div class="popup-title">' + (feature.properties.name || '') + '</div>' +
                     (feature.properties.notes_context || '') + '<br>' +
-                    '<b>Hours:</b> ' + (feature.properties.popup_display || 'Unknown') +
+                    '<b>Hours:</b><b> ' + (feature.properties.popup_display || 'Unknown') +
                     '<a class="popup-button" target="_blank" href="https://www.google.com/maps/dir/?api=1&destination=' +
                         feature.geometry.coordinates[1] + ',' + feature.geometry.coordinates[0] +
-                        '&travelmode=walking">🧭 Walk Directions</a>' +
+                        '&travelmode=walking">Google Maps</a>' +
                 '</div>';
 
             layer.bindPopup(html, { maxHeight: 400 });
