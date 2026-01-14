@@ -9,12 +9,8 @@
 
     <!-- Leaflet CSS -->
     <link rel="stylesheet" href="css/leaflet.css">
-
-    <!-- Custom CSS -->
     <link rel="stylesheet" href="css/qgis2web.css">
     <link rel="stylesheet" href="css/fontawesome-all.min.css">
-
-    <!-- Leaflet Locate Control CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet.locatecontrol/dist/L.Control.Locate.min.css" />
 
     <style>
@@ -23,126 +19,56 @@
             margin: 0;
             padding: 0;
         }
+
         #map {
             width: 100%;
             height: 100%;
         }
-        .popup-content { font-size: 14px; line-height: 1.3; }
-        .popup-title { font-weight: 600; margin-bottom: 4px; }
-        .popup-features span { font-size: 18px; margin-right: 6px; }
+
+        .popup-content {
+            font-size: 14px;
+            line-height: 1.35;
+        }
+
+        .popup-title {
+            font-weight: 600;
+            margin: 6px 0 4px 0;
+        }
+
+        /* Larger feature dots */
+        .popup-features span {
+            font-size: 20px;      /* ⬅️ bigger dots */
+            font-weight: 700;
+            margin-right: 8px;
+        }
+
+        /* Google Maps button */
         .popup-button {
             display: block;
             text-align: center;
             background: #1a73e8;
-            color: rgb(0, 0, 0);
-            padding: 8px;
+            padding: 10px;
             border-radius: 6px;
             text-decoration: none;
             font-weight: 600;
-            margin-top: 6px;
+            margin-top: 8px;
+        }
+
+        /* Force readable white text on all link states */
+        .popup-button,
+        .popup-button:link,
+        .popup-button:visited,
+        .popup-button:hover,
+        .popup-button:active {
+            color: #ffffff !important;
         }
     </style>
 
     <title>San Francisco Water Fountains</title>
 </head>
 <body>
-    <div id="map"></div>
+<div id="map"></div>
 
-    <!-- JS Libraries -->
-    <script src="js/leaflet.js"></script>
-    <script src="js/Autolinker.min.js"></script>
-    <script src="js/leaflet.photon.js"></script>
-    <script src="https://unpkg.com/leaflet.locatecontrol/dist/L.Control.Locate.min.js"></script>
-
-    <!-- GeoJSON data -->
-    <script src="data/fountains_cleansan_francisco_public_bathrooms_and_water_fountains_20251207_1.js"></script>
-
-    <script>
-        // Initialize map
-        var map = L.map('map', {
-            zoomControl: false,
-            maxZoom: 28,
-            minZoom: 1
-        }).fitBounds([[37.7685,-122.4272],[37.8035,-122.3593]]);
-
-        // Basemap
-        L.tileLayer(
-            'https://server.arcgisonline.com/arcgis/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}',
-            { maxZoom: 28 }
-        ).addTo(map);
-
-        // Locate button
-        L.control.locate({
-            position: 'topleft',
-            strings: { title: "Show my location" },
-            locateOptions: { enableHighAccuracy: true }
-        }).addTo(map);
-
-        // Attribution
-        map.attributionControl.setPrefix(
-            '<a href="https://github.com/tomchadwin/qgis2web" target="_blank">qgis2web</a> · ' +
-            '<a href="https://leafletjs.com" target="_blank">Leaflet</a> · ' +
-            '<a href="https://qgis.org" target="_blank">QGIS</a>'
-        );
-
-        // Conditional dot color
-        function dotColor(field, feature) {
-            return feature.properties[field] === true || feature.properties[field] === 'true'
-                ? '#2ecc71'
-                : '#555';
-        }
-
-        // Popup
-        function fountainPopup(feature, layer) {
-    var html =
-        '<div class="popup-content">' +
-
-            '<div class="popup-features">' +
-                '<span style="color:' + dotColor('water_fountain', feature) + ';">●</span> Water Fountain<br>' +
-                '<span style="color:' + dotColor('bottle_filler', feature) + ';">●</span> Bottle Filler<br>' +
-                '<span style="color:' + dotColor('jug_filler', feature) + ';">●</span> Jug Filler<br>' +
-                '<span style="color:' + dotColor('dog_fountain', feature) + ';">●</span> Dog Fountain' +
-            '</div>' +
-
-            '<div class="popup-title">' + (feature.properties.name || '') + '</div>' +
-
-            (feature.properties.notes_context ? feature.properties.notes_context + '<br>' : '') +
-
-            '<b>Hours:</b><br>' +
-            (feature.properties.popup_display || 'Unknown') + '<br>' +
-
-            '<a class="popup-button" target="_blank" href="https://www.google.com/maps/dir/?api=1&destination=' +
-                feature.geometry.coordinates[1] + ',' +
-                feature.geometry.coordinates[0] +
-                '&travelmode=walking">Google Maps</a>' +
-
-        '</div>';
-
-    layer.bindPopup(html, { maxHeight: 400 });
-}
-
-
-        // Marker style
-        function fountainStyle() {
-            return {
-                radius: 8,
-                color: '#232323',
-                weight: 1,
-                fillColor: '#3da5e1',
-                fillOpacity: 1
-            };
-        }
-
-        // Add fountains
-        L.geoJson(
-            json_fountains_cleansan_francisco_public_bathrooms_and_water_fountains_20251207_1,
-            {
-                onEachFeature: fountainPopup,
-                pointToLayer: function (feature, latlng) {
-                    return L.circleMarker(latlng, fountainStyle());
-                }
-            }
-        ).addTo(map);
-    </script>
-</body>
-</html>
+<!-- JS Libraries -->
+<script src="js/leaflet.js"></script>
+<script src="js/Autolinker.min.js"></s
