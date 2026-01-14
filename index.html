@@ -29,7 +29,7 @@
         }
         .popup-content { font-size: 14px; line-height: 1.3; }
         .popup-title { font-weight: 600; margin-bottom: 4px; }
-        .popup-features span { font-size: 14px; margin-right: 6px; }
+        .popup-features span { font-size: 18px; margin-right: 6px; }
         .popup-button {
             display: block;
             text-align: center;
@@ -94,29 +94,38 @@
 
         // Popup
         function fountainPopup(feature, layer) {
-            var html =
-                '<div class="popup-content">' +
-                    '<div class="popup-features">' +
-                        '<span style="color:' + dotColor('water_fountain', feature) + ';">●</span> Water Fountain<br>' +
-                        '<span style="color:' + dotColor('bottle_filler', feature) + ';">●</span> Bottle Filler<br>' +
-                        '<span style="color:' + dotColor('jug_filler', feature) + ';">●</span> Jug Filler<br>' +
-                        '<span style="color:' + dotColor('dog_fountain', feature) + ';">●</span> Dog Fountain' +
-                    '</div>' +
-                    '<div class="popup-title">' + (feature.properties.name || '') + '</div>' +
-                    (feature.properties.notes_context || '') + '<br>' +
-                    '<b>Hours:</b><br> ' + (feature.properties.popup_display || 'Unknown') +
-                    '<a class="popup-button" target="_blank" href="https://www.google.com/maps/dir/?api=1&destination=' +
-                        feature.geometry.coordinates[1] + ',' + feature.geometry.coordinates[0] +
-                        '&travelmode=walking">Google Maps</a>' +
-                '</div>';
+    var html =
+        '<div class="popup-content">' +
 
-            layer.bindPopup(html, { maxHeight: 400 });
-        }
+            '<div class="popup-features">' +
+                '<span style="color:' + dotColor('water_fountain', feature) + ';">●</span> Water Fountain<br>' +
+                '<span style="color:' + dotColor('bottle_filler', feature) + ';">●</span> Bottle Filler<br>' +
+                '<span style="color:' + dotColor('jug_filler', feature) + ';">●</span> Jug Filler<br>' +
+                '<span style="color:' + dotColor('dog_fountain', feature) + ';">●</span> Dog Fountain' +
+            '</div>' +
+
+            '<div class="popup-title">' + (feature.properties.name || '') + '</div>' +
+
+            (feature.properties.notes_context ? feature.properties.notes_context + '<br>' : '') +
+
+            '<b>Hours:</b><br>' +
+            (feature.properties.popup_display || 'Unknown') + '<br>' +
+
+            '<a class="popup-button" target="_blank" href="https://www.google.com/maps/dir/?api=1&destination=' +
+                feature.geometry.coordinates[1] + ',' +
+                feature.geometry.coordinates[0] +
+                '&travelmode=walking">Google Maps</a>' +
+
+        '</div>';
+
+    layer.bindPopup(html, { maxHeight: 400 });
+}
+
 
         // Marker style
         function fountainStyle() {
             return {
-                radius: 4,
+                radius: 8,
                 color: '#232323',
                 weight: 1,
                 fillColor: '#3da5e1',
