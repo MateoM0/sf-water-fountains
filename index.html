@@ -37,7 +37,7 @@
 
         /* Larger feature dots */
         .popup-features span {
-            font-size: 20px;      /* ⬅️ bigger dots */
+            font-size: 20px;
             font-weight: 700;
             margin-right: 8px;
         }
@@ -54,7 +54,7 @@
             margin-top: 8px;
         }
 
-        /* Force readable white text on all link states */
+        /* Force readable white text */
         .popup-button,
         .popup-button:link,
         .popup-button:visited,
@@ -66,6 +66,7 @@
 
     <title>San Francisco Water Fountains</title>
 </head>
+
 <body>
 <div id="map"></div>
 
@@ -73,3 +74,95 @@
 <script src="js/leaflet.js"></script>
 <script src="js/Autolinker.min.js"></script>
 <script src="https://unpkg.com/leaflet.locatecontrol/dist/L.Control.Locate.min.js"></script>
+
+<!-- GeoJSON data -->
+<script src="data/fountains_cleansan_francisco_public_bathrooms_and_water_fountains_20251207_1.js"></script>
+
+<script>
+    /* =====================
+       MAP INITIALIZATION
+       ===================== */
+    var map = L.map('map', {
+        zoomControl: false,
+        minZoom: 1,
+        maxZoom: 28
+    }).fitBounds([
+        [37.7685, -122.4272],
+        [37.8035, -122.3593]
+    ]);
+
+    L.tileLayer(
+        'https://server.arcgisonline.com/arcgis/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}',
+        { maxZoom: 28 }
+    ).addTo(map);
+
+    L.control.zoom({ position: 'topleft' }).addTo(map);
+
+    L.control.locate({
+        position: 'topleft',
+        strings: { title: "Show my location" },
+        locateOptions: { enableHighAccuracy: true }
+    }).addTo(map);
+
+    /* =====================
+       POPUP HELPERS
+       ===================== */
+    function dotColor(field, feature) {
+        return (feature.properties[field] === true || feature.properties[field] === 'true')
+            ? '#2ecc71'
+            : '#555';
+    }
+
+    function fountainPopup(feature, layer) {
+        var html =
+            '<div class="popup-content">' +
+
+                '<div class="popup-features">' +
+                    '<span style="color:' + dotColor('water_fountain', feature) + ';">●</span> Water Fountain<br>' +
+                    '<span style="color:' + dotColor('bottle_filler', feature) + ';">●</span> Bottle Filler<br>' +
+                    '<span style="color:' + dotColor('jug_filler', feature) + ';">●</span> Jug Filler<br>' +
+                    '<span style="color:' + dotColor('dog_fountain', feature) + ';">●</span> Dog Fountain' +
+                '</div>' +
+
+                '<div class="popup-title">' + (feature.properties.name || '') + '</div>' +
+
+                (feature.properties.notes_context ? feature.properties.notes_context + '<br>' : '') +
+
+                '<b>Hours:</b><br>' +
+                (feature.properties.popup_display || 'Unknown') +
+
+                '<a class="popup-button" target="_blank" href="https://www.google.com/maps/dir/?api=1&destination=' +
+                    feature.geometry.coordinates[1] + ',' +
+                    feature.geometry.coordinates[0] +
+                    '&travelmode=walking">Google Maps</a>' +
+
+            '</div>';
+
+        layer.bindPopup(html, { maxHeight: 400 });
+    }
+
+    /* =====================
+       MARKERS
+       ===================== */
+    function fountainStyle() {
+        return {
+            radius: 8,
+            color: '#232323',
+            weight: 1,
+            fillColor: '#3da5e1',
+            fillOpacity: 1
+        };
+    }
+
+    L.geoJson(
+        json_fountains_cleansan_francisco_public_bathrooms_and_water_fountains_20251207_1,
+        {
+            onEachFeature: fountainPopup,
+            pointToLayer: function (feature, latlng) {
+                return L.circleMarker(latlng, fountainStyle());
+            }
+        }
+    ).addTo(map);
+</script>
+</body>
+</html>
