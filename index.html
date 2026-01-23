@@ -54,13 +54,40 @@
             margin-top: 8px;
         }
 
-        /* Force readable white text */
         .popup-button,
         .popup-button:link,
         .popup-button:visited,
         .popup-button:hover,
         .popup-button:active {
             color: #ffffff !important;
+        }
+
+        /* Legend styling */
+        .legend {
+            background: white;
+            padding: 10px 12px;
+            font-size: 13px;
+            line-height: 1.4;
+            color: #333;
+            border-radius: 6px;
+            box-shadow: 0 0 6px rgba(0,0,0,0.15);
+        }
+
+        .legend-title {
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 4px;
+        }
+
+        .legend-dot {
+            font-size: 16px;
+            margin-right: 6px;
+            line-height: 1;
         }
     </style>
 
@@ -103,6 +130,26 @@
         strings: { title: "Show my location" },
         locateOptions: { enableHighAccuracy: true }
     }).addTo(map);
+
+    /* =====================
+       LEGEND
+       ===================== */
+    var legend = L.control({ position: 'bottomright' });
+
+    legend.onAdd = function () {
+        var div = L.DomUtil.create('div', 'legend');
+        div.innerHTML =
+            '<div class="legend-title">Fountain Service</div>' +
+            '<div class="legend-item">' +
+                '<span class="legend-dot" style="color:#2ecc71;">●</span> Available' +
+            '</div>' +
+            '<div class="legend-item">' +
+                '<span class="legend-dot" style="color:#555;">●</span> Unavailable' +
+            '</div>';
+        return div;
+    };
+
+    legend.addTo(map);
 
     /* =====================
        POPUP HELPERS
